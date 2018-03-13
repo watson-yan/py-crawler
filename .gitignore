@@ -104,3 +104,5 @@ ENV/
 #image
 image/
 /node_modules/
+/config/
+data.js

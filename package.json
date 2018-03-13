@@ -1,6 +1,11 @@
 {
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev node app.js",
+    "build": "cross-env NODE_ENV=production node app.js"
+  },
   "dependencies": {
     "cos-nodejs-sdk-v5": "^2.3.0",
+    "cross-env": "^5.1.4",
     "mongoose": "^5.0.9",
     "request": "^2.83.0"
   }

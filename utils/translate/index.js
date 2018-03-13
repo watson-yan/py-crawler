@@ -2,20 +2,20 @@ const MD5 = require('./md5')
 const qs = require('qs')
 const request = require('request')
 
-module.exports = async list => {
-  const newList = []
-  for(let item of list) {
-    if (item.alt.indexOf('Free stock photo of') !== -1) {
-      tagList = item.alt.replace('Free stock photo of ', '')
-      let result = await translate(tagList)
-      result = result.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/ig, ',')
-      item.tags = result.split(',')
-    }
-    // item.name = await translate(item.alt)
-    newList.push(item)
-  }
-  return newList
-}
+// module.exports = async list => {
+//   const newList = []
+//   for(let item of list) {
+//     if (item.alt.indexOf('Free stock photo of') !== -1) {
+//       tagList = item.alt.replace('Free stock photo of ', '')
+//       let result = await translate(tagList)
+//       result = result.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/ig, ',')
+//       item.tags = result.split(',')
+//     }
+//     // item.name = await translate(item.alt)
+//     newList.push(item)
+//   }
+//   return newList
+// }
 
 const translate = async query => {
   const appid = '2015063000000001';
@@ -44,3 +44,5 @@ const translate = async query => {
     })
   })
 }
+
+module.exports = translate

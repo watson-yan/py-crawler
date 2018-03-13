@@ -1,6 +1,7 @@
 const request = require('request')
+const config = require('../config')
 
-let rootPath
+let rootPath = config.rootPath
 let authorization
 const getHeader = () => {
   const header = {
@@ -22,7 +23,6 @@ const send = async (url, data) => {
       body: data
     }, function(error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log(body)
         resolve(body)
       } else {
         if (!error && response.statusCode == 401) {
@@ -37,17 +37,15 @@ const send = async (url, data) => {
   })
 }
 
-module.exports = async (list, path) => {
-  rootPath = path
+module.exports = async (list) => {
   list = list.map(item => {
     delete item._id
     delete item.servered
     return item
   })
-  console.log(list)
   
-  await send('/login', {username: 'watson', password: 861007}).then((data) => {
-    console.log(data)
+  await send('/login', {username: config.user.name, password: config.user.password}).then((data) => {
+    // console.log(data)
     authorization = data.token
   }).catch(err => {
     console.log(err)

@@ -1,106 +1,58 @@
-const request = require('request')
 const mongoose = require('mongoose')
-const translate = require('./translate/index')
 const mongo = require('./mongo.js')
-const data = require('./data')
-const cos = require('./cos')
-const toServer = require('./toServer')
 const db = mongo()
-
-const serverPath = 'https://www.xiaowd.com'
-
+const config = require('./config')
+// 图片数据
+const data = require('./data')
+// 核心方法
+const {cos, request, toServer} = require('./utils/index')
+// Controller
+const imgController = require('./controller/imgController')
+// Models
 const Img = mongoose.model('Img')
-const Count = mongoose.model('Count')
+
+
 
 async function main() {
   let imgList = await translate(data)
   for (img of imgList) {
-    await imgSave(img)
+    await imgController.save(img)
   }
 }
 
-// const imgs = Img.find({servered: false}).then((doc) => {
-//   toServer(doc, serverPath)
-//   if (serverPath.indexOf('xiaowd') !== -1) {
-//     for (let img of doc) {
-//       img.servered = true
-//       img.save()
-//     }
-//   }
-// })
+console.log(serverPath)
 
-main()
+// TODO:做标签去重
+const imgs = Img.find({servered: true}).then(async doc => {
+  
+  // console.log(doc.length)
+  // toServer(doc, serverPath)
+  // if (serverPath.indexOf('xiaowd') !== -1) {
+  //   for (let img of doc) {
+  //     img.servered = true
+  //     img.save()
+  //   }
+  // }
 
-async function imgSave(img) {
-  const _img = await Img.findOne({from_url: img.url})
-  if (_img) {
-    return
-  }
-  if (!img.name) {
-    img.name =img.alt
-  }
-  img.address = img.url
-  let count = await Count.findOne()
-  if (!count) {
-    count = new Count({ img_count: 0 })
-    await count.save()
-  }
-  const buffer = await _request({ url: img.url, encoding: null })
-  img.from_url = img.url
-  // return
-  count.img_count++
-  const name = `p/xiaowd-img-${count.img_count}.${getFileType(img.url)}`
-  await count.save()
-  await cos(name, buffer)
-        .catch(err => {
-          console.log(err)
-          return
-        })
-  const body = await _request(`https://image.xiaowd.com/${name}?imageInfo`)
-  let info
-  try {
-    info = JSON.parse(body)
-  } catch (err) {
-    console.log(err)
-    return
-  }
-  if (!info) {
-    console.log('没有图片返回信息')
-  }
-  img.file_name = name.replace('/p/', '')
-  img.storage = true
-  img.url = `https://image.xiaowd.com/${name}`
-  img.etag = info.md5
-  img.type = info.format
-  img.width = info.width
-  img.height = info.height
-  img.size = info.size
-  img.storage = true
-  img.img_rgb = getHexColor(info.photo_rgb)
-  await new Img(img).save()
+  // 翻译名称
+  // for (let img of doc) {
+  //   // img.name = await translate(img.name)
+  //   img.name = img.name.replace('的照片', '图片')
+  //                       .replace('库存照片', '图片')
+  //                       .replace('照片', '图片')
+  //   await img.save()
+  //   console.log(img.name)
+  // }
+})
+
+// main()
+
+
+
+async function update(img) {
+  request('/admin/img/update')
 }
 
-async function _request (option) {
-  return new Promise((resolve, reject) => {
-    request(option, async (err, res, data) => {
-      if (err) {
-        console.log(option)
-        console.log(err)
-        reject(err)
-      } else {
-        if (res.statusCode == 200) { 
-          resolve(data)
-        }
-      }
-    })
-  })
-}
 
-function getHexColor(val) { 
-  return '#' + ('00000' + (Math.random() * val << 0).toString(16)).substr(-6);
-}
 
-function getFileType(val) {
-  const list = val.split('/')
-  return list[list.length-1].split('.')[1] || 'jpeg'
-}
+
