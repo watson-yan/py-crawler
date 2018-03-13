@@ -5,8 +5,9 @@ const mongo = require('./mongo.js')
 const data = require('./data')
 const cos = require('./cos')
 const toServer = require('./toServer')
-
 const db = mongo()
+
+const serverPath = 'https://www.xiaowd.com'
 
 const Img = mongoose.model('Img')
 const Count = mongoose.model('Count')
@@ -18,15 +19,17 @@ async function main() {
   }
 }
 
-const imgs = Img.find({}).then((doc) => {
-  toServer(doc)
-  // for (let img of doc) {
-  //   img.storage = true
-  //   img.save()
-  // }
-})
+// const imgs = Img.find({servered: false}).then((doc) => {
+//   toServer(doc, serverPath)
+//   if (serverPath.indexOf('xiaowd') !== -1) {
+//     for (let img of doc) {
+//       img.servered = true
+//       img.save()
+//     }
+//   }
+// })
 
-// main()
+main()
 
 async function imgSave(img) {
   const _img = await Img.findOne({from_url: img.url})

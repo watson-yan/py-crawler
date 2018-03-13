@@ -1,6 +1,6 @@
 const request = require('request')
 
-const rootPath = 'http://localhost:8000'
+let rootPath
 let authorization
 const getHeader = () => {
   const header = {
@@ -37,7 +37,8 @@ const send = async (url, data) => {
   })
 }
 
-module.exports = async (list) => {
+module.exports = async (list, path) => {
+  rootPath = path
   list = list.map(item => {
     delete item._id
     delete item.servered
